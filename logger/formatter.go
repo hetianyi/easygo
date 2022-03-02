@@ -11,8 +11,10 @@ import (
 //
 //  [I] [PREFIX] 2022-03-02 21:35:43 | xxxxx
 //  [E] [PREFIX] 2022-03-02 21:35:43 | xxxxx
-func DefaultFormatter(l *logger, t time.Time, level LogLevel, content string) {
-	log := fmt.Sprintf("[%s] %s%s | %s\n", levelColor(level), l.Prefix, timeColor(timex.GetLongDateString(t)), logColor(level, content))
+func DefaultFormatter(l *logger, t time.Time, level LogLevel, v ...interface{}) {
+	log := fmt.Sprintf("[%s] %s%s | %s\n",
+		levelColor(level), l.Prefix,
+		timeColor(timex.GetLongDateString(t)), logColor(level, fmt.Sprint(v...)))
 	l.Out.Write([]byte(log))
 }
 

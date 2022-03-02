@@ -31,7 +31,7 @@ type logger struct {
 	formatter Formatter
 }
 
-type Formatter func(l *logger, t time.Time, level LogLevel, content string)
+type Formatter func(l *logger, t time.Time, level LogLevel, v ...interface{})
 
 // New 初始化一个日志实例
 func New(out io.Writer, prefix string, level LogLevel, formatter Formatter) *logger {
@@ -53,12 +53,12 @@ func NewDefaultLogger() *logger {
 }
 
 // Info 以Info级别打印日志
-func (l *logger) output(level LogLevel, content string) {
+func (l *logger) output(level LogLevel, v ...interface{}) {
 	// 日志级别低于设置的级别，则不处理
 	if level < l.Level {
 		return
 	}
-	l.formatter(l, time.Now(), level, content)
+	l.formatter(l, time.Now(), level, v...)
 }
 
 // SetOut 设置日志输入
@@ -86,43 +86,43 @@ func (l *logger) SetPrefix(prefix string) {
 }
 
 // Debug 以Debug级别打印日志
-func (l *logger) Debug(log string) {
+func (l *logger) Debug(v ...interface{}) {
 	l.lock.Lock()
 	defer l.lock.Unlock()
 
-	l.output(LevelDebug, log)
+	l.output(LevelDebug, v...)
 }
 
 // Info 以Info级别打印日志
-func (l *logger) Info(log string) {
+func (l *logger) Info(v ...interface{}) {
 	l.lock.Lock()
 	defer l.lock.Unlock()
 
-	l.output(LevelInfo, log)
+	l.output(LevelInfo, v...)
 }
 
 // Warn 以Warn级别打印日志
-func (l *logger) Warn(log string) {
+func (l *logger) Warn(v ...interface{}) {
 	l.lock.Lock()
 	defer l.lock.Unlock()
 
-	l.output(LevelWarn, log)
+	l.output(LevelWarn, v...)
 }
 
 // Error 以Error级别打印日志
-func (l *logger) Error(log string) {
+func (l *logger) Error(v ...interface{}) {
 	l.lock.Lock()
 	defer l.lock.Unlock()
 
-	l.output(LevelError, log)
+	l.output(LevelError, v...)
 }
 
 // Fatal 以Fatal级别打印日志
-func (l *logger) Fatal(log string) {
+func (l *logger) Fatal(v ...interface{}) {
 	l.lock.Lock()
 	defer l.lock.Unlock()
 
-	l.output(LevelFatal, log)
+	l.output(LevelFatal, v...)
 }
 
 func ParseLevel(levelName string) LogLevel {

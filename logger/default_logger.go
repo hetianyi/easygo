@@ -45,31 +45,31 @@ func SetPrefix(prefix string) {
 }
 
 // Debug 以Debug级别打印日志
-func Debug(log string) {
+func Debug(v ...interface{}) {
 	initLogger()
-	defaultLogger.Debug(log)
+	defaultLogger.Debug(v...)
 }
 
 // Info 以Info级别打印日志
-func Info(log string) {
+func Info(v ...interface{}) {
 	initLogger()
-	defaultLogger.Info(log)
+	defaultLogger.Info(v...)
 }
 
 // Warn 以Warn级别打印日志
-func Warn(log string) {
+func Warn(v ...interface{}) {
 	initLogger()
-	defaultLogger.Warn(log)
+	defaultLogger.Warn(v...)
 }
 
 // Error 以Error级别打印日志
-func Error(log string) {
+func Error(v ...interface{}) {
 	initLogger()
-	defaultLogger.Error(log)
+	defaultLogger.Error(v...)
 }
 
 // Fatal 以Fatal级别打印日志
-func Fatal(log string) {
+func Fatal(v ...interface{}) {
 	initLogger()
-	defaultLogger.Fatal(log)
+	defaultLogger.Fatal(v...)
 }
