@@ -24,3 +24,13 @@ func TestNewDefaultLogger(t *testing.T) {
 	log.Error("你好")
 	log.Fatal("你好")
 }
+
+func TestInitDefaultLogger(t *testing.T) {
+	logger.InitDefaultLogger()
+	logger.SetPrefix("[WEB] ")
+	logger.Debug("你好")
+	logger.Info("你好")
+	logger.Warn("你好")
+	logger.Error("你好")
+	logger.Fatal("你好")
+}

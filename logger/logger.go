@@ -54,6 +54,10 @@ func NewDefaultLogger() *logger {
 
 // Info 以Info级别打印日志
 func (l *logger) output(level LogLevel, content string) {
+	// 日志级别低于设置的级别，则不处理
+	if level < l.Level {
+		return
+	}
 	l.formatter(l, time.Now(), level, content)
 }
 
