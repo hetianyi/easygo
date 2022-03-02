@@ -26,7 +26,7 @@ func TestNewDefaultLogger(t *testing.T) {
 }
 
 func TestInitDefaultLogger(t *testing.T) {
-	logger.InitDefaultLogger()
+	//logger.InitDefaultLogger()
 	logger.SetPrefix("[WEB] ")
 	logger.Debug("你好")
 	logger.Info("你好")
