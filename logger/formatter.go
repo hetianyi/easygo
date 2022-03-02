@@ -1,8 +1,8 @@
 package logger
 
 import (
-	"easygo/timex"
 	"fmt"
+	"github.com/hetianyi/easygo/timex"
 	. "github.com/logrusorgru/aurora"
 	"time"
 )

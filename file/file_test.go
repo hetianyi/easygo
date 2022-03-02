@@ -2,11 +2,11 @@ package file_test
 
 import (
 	"bytes"
-	"easygo/convert"
-	"easygo/file"
-	"easygo/timex"
 	"encoding/base64"
 	"fmt"
+	"github.com/hetianyi/easygo/convert"
+	"github.com/hetianyi/easygo/file"
+	"github.com/hetianyi/easygo/timex"
 	"log"
 	"math/rand"
 	"testing"

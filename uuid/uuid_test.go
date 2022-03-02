@@ -1,8 +1,8 @@
 package uuid_test
 
 import (
-	"easygo/uuid"
 	"fmt"
+	"github.com/hetianyi/easygo/uuid"
 	"testing"
 )
 

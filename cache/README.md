@@ -5,7 +5,7 @@ package cache is bytes/interface cache manager.
 Usage:
 
 ```golang
-import "easygo/cache"
+import "github.com/hetianyi/easygo/cache"
 // apply cache
 bc := cache.ApplyBytes(bufferSize, false)
 // recache

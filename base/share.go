@@ -7,9 +7,9 @@ package base
 import (
 	"container/list"
 	"crypto/md5"
-	"easygo/convert"
 	"encoding/hex"
 	"fmt"
+	"github.com/hetianyi/easygo/convert"
 	"io"
 	"math/rand"
 	"net"

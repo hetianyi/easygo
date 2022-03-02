@@ -1,10 +1,10 @@
 package gifx_test
 
 import (
-	"easygo/file"
-	"easygo/img"
-	"easygo/img/gifx"
 	"github.com/disintegration/imaging"
+	"github.com/hetianyi/easygo/file"
+	"github.com/hetianyi/easygo/img"
+	"github.com/hetianyi/easygo/img/gifx"
 	"image/gif"
 	"log"
 	"testing"

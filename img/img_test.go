@@ -1,11 +1,11 @@
 package img_test
 
 import (
-	"easygo/file"
-	"easygo/fontx"
-	"easygo/img"
-	"easygo/logger"
 	"github.com/disintegration/imaging"
+	"github.com/hetianyi/easygo/file"
+	"github.com/hetianyi/easygo/fontx"
+	"github.com/hetianyi/easygo/img"
+	"github.com/hetianyi/easygo/logger"
 	"image"
 	"image/color"
 	"log"

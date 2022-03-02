@@ -2,9 +2,9 @@ package fontx_test
 
 import (
 	"bufio"
-	"easygo/img"
 	"fmt"
 	"github.com/golang/freetype"
+	"github.com/hetianyi/easygo/img"
 	"golang.org/x/image/font"
 	"image"
 	"image/draw"

@@ -1,7 +1,7 @@
 package cache_test
 
 import (
-	"easygo/cache"
+	"github.com/hetianyi/easygo/cache"
 	"testing"
 	"time"
 )

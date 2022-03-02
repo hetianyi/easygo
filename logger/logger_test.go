@@ -1,7 +1,7 @@
 package logger_test
 
 import (
-	"easygo/logger"
+	"github.com/hetianyi/easygo/logger"
 	"os"
 	"testing"
 )

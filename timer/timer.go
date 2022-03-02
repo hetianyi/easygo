@@ -1,7 +1,7 @@
 package timer
 
 import (
-	"easygo/cache/base"
+	"github.com/hetianyi/easygo/base"
 	"time"
 )
 

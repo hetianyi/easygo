@@ -7,9 +7,9 @@ package gifx
 
 import (
 	"bytes"
-	"easygo/file"
-	"easygo/img"
 	"github.com/disintegration/imaging"
+	"github.com/hetianyi/easygo/file"
+	"github.com/hetianyi/easygo/img"
 	"image"
 	"image/draw"
 	"image/gif"

@@ -1,9 +1,9 @@
 package httpx_test
 
 import (
-	"easygo/file"
-	"easygo/httpx"
 	"encoding/json"
+	"github.com/hetianyi/easygo/file"
+	"github.com/hetianyi/easygo/httpx"
 	"io"
 	"io/ioutil"
 	"log"

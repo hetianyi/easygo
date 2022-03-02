@@ -3,9 +3,9 @@ package httpx
 import (
 	"bytes"
 	"compress/gzip"
-	"easygo/cache/base"
-	"easygo/convert"
 	"errors"
+	"github.com/hetianyi/easygo/base"
+	"github.com/hetianyi/easygo/convert"
 	json "github.com/json-iterator/go"
 	"io"
 	"io/ioutil"

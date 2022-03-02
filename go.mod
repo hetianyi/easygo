@@ -1,4 +1,4 @@
-module easygo
+module github.com/hetianyi/easygo
 
 go 1.16
 

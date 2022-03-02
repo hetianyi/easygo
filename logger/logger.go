@@ -1,7 +1,7 @@
 package logger
 
 import (
-	"easygo/cache/base"
+	"github.com/hetianyi/easygo/base"
 	"io"
 	"os"
 	"sync"

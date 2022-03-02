@@ -4,9 +4,9 @@ import (
 	"bytes"
 	"crypto/cipher"
 	"crypto/des"
-	"easygo/convert"
 	"encoding/base64"
 	"fmt"
+	"github.com/hetianyi/easygo/convert"
 	"testing"
 	"time"
 )

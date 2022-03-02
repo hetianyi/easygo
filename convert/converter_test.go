@@ -1,8 +1,8 @@
 package convert_test
 
 import (
-	"easygo/convert"
 	"fmt"
+	"github.com/hetianyi/easygo/convert"
 	"os"
 	"testing"
 )

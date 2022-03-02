@@ -2,10 +2,10 @@ package img
 
 import (
 	"bytes"
-	"easygo/file"
-	"easygo/fontx"
 	"github.com/beta/freetype"
 	"github.com/disintegration/imaging"
+	"github.com/hetianyi/easygo/file"
+	"github.com/hetianyi/easygo/fontx"
 	"golang.org/x/image/font"
 	"image"
 	"image/color"
