@@ -1,14 +1,9 @@
-package base_test
+package base
 
 import (
 	"bytes"
 	"crypto/cipher"
 	"crypto/des"
-	"encoding/base64"
-	"fmt"
-	"github.com/hetianyi/easygo/convert"
-	"testing"
-	"time"
 )
 
 func DesEncryption(key, iv, plainText []byte) ([]byte, error) {
@@ -20,11 +15,11 @@ func DesEncryption(key, iv, plainText []byte) ([]byte, error) {
 	}
 
 	blockSize := block.BlockSize()
-	origData := PKCS5Padding(plainText, blockSize)
+	origData := pkcs5Padding(plainText, blockSize)
 	blockMode := cipher.NewCBCEncrypter(block, iv)
-	cryted := make([]byte, len(origData))
-	blockMode.CryptBlocks(cryted, origData)
-	return cryted, nil
+	crypt := make([]byte, len(origData))
+	blockMode.CryptBlocks(crypt, origData)
+	return crypt, nil
 }
 
 func DesDecryption(key, iv, cipherText []byte) ([]byte, error) {
@@ -38,23 +33,23 @@ func DesDecryption(key, iv, cipherText []byte) ([]byte, error) {
 	blockMode := cipher.NewCBCDecrypter(block, iv)
 	origData := make([]byte, len(cipherText))
 	blockMode.CryptBlocks(origData, cipherText)
-	origData = PKCS5UnPadding(origData)
+	origData = pkcs5UnPadding(origData)
 	return origData, nil
 }
 
-func PKCS5Padding(src []byte, blockSize int) []byte {
+func pkcs5Padding(src []byte, blockSize int) []byte {
 	padding := blockSize - len(src)%blockSize
-	padtext := bytes.Repeat([]byte{byte(padding)}, padding)
-	return append(src, padtext...)
+	padText := bytes.Repeat([]byte{byte(padding)}, padding)
+	return append(src, padText...)
 }
 
-func PKCS5UnPadding(src []byte) []byte {
+func pkcs5UnPadding(src []byte) []byte {
 	length := len(src)
-	unpadding := int(src[length-1])
-	return src[:(length - unpadding)]
+	unPadding := int(src[length-1])
+	return src[:(length - unPadding)]
 }
 
-func TestDES(t *testing.T) {
+/*func TestDES(t *testing.T) {
 	originalText := convert.Int64ToStr(time.Now().UnixNano()) + "|123456789012345678901234567890df"
 	fmt.Println(originalText)
 	mytext := []byte(originalText)
@@ -70,4 +65,4 @@ func TestDES(t *testing.T) {
 	bs, _ := base64.StdEncoding.DecodeString(base64String)
 	decryptedText, _ := DesDecryption(key, iv, bs)
 	fmt.Println(string(decryptedText))
-}
+}*/
