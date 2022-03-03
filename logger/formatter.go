@@ -4,6 +4,9 @@ import (
 	"fmt"
 	"github.com/hetianyi/easygo/timex"
 	. "github.com/logrusorgru/aurora"
+	"runtime"
+	"strconv"
+	"strings"
 	"time"
 )
 
@@ -12,9 +15,23 @@ import (
 //  [I] [PREFIX] 2022-03-02 21:35:43 | xxxxx
 //  [E] [PREFIX] 2022-03-02 21:35:43 | xxxxx
 func DefaultFormatter(l *logger, t time.Time, level LogLevel, v ...interface{}) {
+	log := fmt.Sprintf("[%s] %s%s %s | %s\n",
+		levelColor(level), l.Prefix,
+		timeColor(timex.GetLongDateString(t)),
+		GetCaller(),
+		logColor(level, fmt.Sprint(v...)))
+	l.Out.Write([]byte(log))
+}
+
+// SimpleFormatter 是简化的日志格式器，输出格式为
+//
+//  [I] [PREFIX] 2022-03-02 21:35:43 | xxxxx
+//  [E] [PREFIX] 2022-03-02 21:35:43 | xxxxx
+func SimpleFormatter(l *logger, t time.Time, level LogLevel, v ...interface{}) {
 	log := fmt.Sprintf("[%s] %s%s | %s\n",
 		levelColor(level), l.Prefix,
-		timeColor(timex.GetLongDateString(t)), logColor(level, fmt.Sprint(v...)))
+		timeColor(timex.GetLongDateString(t)),
+		logColor(level, fmt.Sprint(v...)))
 	l.Out.Write([]byte(log))
 }
 
@@ -52,4 +69,12 @@ func logColor(level LogLevel, content string) string {
 		return SlowBlink(BgRed(content)).String()
 	}
 	return content
+}
+
+func GetCaller() string {
+	_, file, line, success := runtime.Caller(4)
+	if success {
+		return Yellow(strings.Join([]string{"[", file[strings.LastIndex(file, "/")+1:], ":", strconv.Itoa(line), "]"}, "")).String()
+	}
+	return " [unknown] "
 }

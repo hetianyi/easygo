@@ -123,6 +123,7 @@ func (l *logger) Fatal(v ...interface{}) {
 	defer l.lock.Unlock()
 
 	l.output(LevelFatal, v...)
+	os.Exit(1)
 }
 
 func ParseLevel(levelName string) LogLevel {
