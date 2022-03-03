@@ -11,18 +11,18 @@ var (
 )
 
 // InitDefaultLogger 初始化一个默认日志实例
-func InitDefaultLogger() {
+func initDefaultLogger() {
 	mu.Lock()
 	defer mu.Unlock()
 
 	if defaultLogger == nil {
-		defaultLogger = NewDefaultLogger()
+		defaultLogger = newDefaultLogger()
 	}
 }
 
 func initLogger() {
 	if defaultLogger == nil {
-		InitDefaultLogger()
+		initDefaultLogger()
 	}
 }
 

@@ -28,6 +28,7 @@ type logger struct {
 	lock      sync.Mutex
 	Prefix    string
 	Level     LogLevel
+	callLevel int
 	formatter Formatter
 }
 
@@ -39,14 +40,16 @@ func New(out io.Writer, prefix string, level LogLevel, formatter Formatter) *log
 		Out:       out,
 		Prefix:    prefix,
 		Level:     level,
+		callLevel: 4,
 		formatter: base.TValue(formatter == nil, DefaultFormatter, formatter).(Formatter),
 	}
 }
 
-// NewDefaultLogger 初始化一个默认日志实例
-func NewDefaultLogger() *logger {
+// newDefaultLogger 初始化一个默认日志实例
+func newDefaultLogger() *logger {
 	return &logger{
 		Out:       os.Stdout,
+		callLevel: 5,
 		Level:     LevelInfo,
 		formatter: DefaultFormatter,
 	}

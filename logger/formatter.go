@@ -18,7 +18,7 @@ func DefaultFormatter(l *logger, t time.Time, level LogLevel, v ...interface{}) 
 	log := fmt.Sprintf("[%s] %s%s %s | %s\n",
 		levelColor(level), l.Prefix,
 		timeColor(timex.GetLongDateString(t)),
-		GetCaller(),
+		GetCaller(l.callLevel),
 		logColor(level, fmt.Sprint(v...)))
 	l.Out.Write([]byte(log))
 }
@@ -71,8 +71,8 @@ func logColor(level LogLevel, content string) string {
 	return content
 }
 
-func GetCaller() string {
-	_, file, line, success := runtime.Caller(4)
+func GetCaller(callLevel int) string {
+	_, file, line, success := runtime.Caller(callLevel)
 	if success {
 		return Yellow(strings.Join([]string{"[", file[strings.LastIndex(file, "/")+1:], ":", strconv.Itoa(line), "]"}, "")).String()
 	}
