@@ -5,8 +5,7 @@
 package timex
 
 import (
-	"bytes"
-	"strconv"
+	"fmt"
 	"sync"
 	"time"
 )
@@ -18,60 +17,48 @@ var (
 
 // GetDateString gets short date format like '2018-11-11'.
 func GetDateString(t time.Time) string {
-	var buff bytes.Buffer
-	buff.WriteString(strconv.Itoa(GetYear(t)))
-	buff.WriteString("-")
-	buff.WriteString(format2(GetMonth(t)))
-	buff.WriteString("-")
-	buff.WriteString(format2(GetDay(t)))
-	return buff.String()
+	return fmt.Sprintf("%d-%s-%s", GetYear(t), format2(int64(GetMonth(t))), format2(int64(GetDay(t))))
+}
+
+// GetCNDateString gets short date format like '2018年11月11日'.
+func GetCNDateString(t time.Time) string {
+	return fmt.Sprintf("%d年%s月%s日", GetYear(t), format2(int64(GetMonth(t))), format2(int64(GetDay(t))))
 }
 
 // GetLongDateString gets date format like '2018-11-11 12:12:12'.
 func GetLongDateString(t time.Time) string {
-	var buff bytes.Buffer
-	buff.WriteString(strconv.Itoa(GetYear(t)))
-	buff.WriteString("-")
-	buff.WriteString(format2(GetMonth(t)))
-	buff.WriteString("-")
-	buff.WriteString(format2(GetDay(t)))
-	buff.WriteString(" ")
-	buff.WriteString(format2(GetHour(t)))
-	buff.WriteString(":")
-	buff.WriteString(format2(GetMinute(t)))
-	buff.WriteString(":")
-	buff.WriteString(format2(GetSecond(t)))
-	return buff.String()
+	return fmt.Sprintf("%d-%s-%s %s:%s:%s",
+		GetYear(t), format2(int64(GetMonth(t))), format2(int64(GetDay(t))),
+		format2(int64(GetHour(t))), format2(int64(GetMinute(t))), format2(int64(GetSecond(t))),
+	)
+}
+
+// GetLongCNDateString gets date format like '2018年11月11日 12时12分12秒'.
+func GetLongCNDateString(t time.Time) string {
+	return fmt.Sprintf("%d年%s月%s日 %s时%s分%s秒",
+		GetYear(t), format2(int64(GetMonth(t))), format2(int64(GetDay(t))),
+		format2(int64(GetHour(t))), format2(int64(GetMinute(t))), format2(int64(GetSecond(t))),
+	)
 }
 
 // GetShortDateString gets time format like '12:12:12'.
 func GetShortDateString(t time.Time) string {
-	var buff bytes.Buffer
-	buff.WriteString(format2(GetHour(t)))
-	buff.WriteString(":")
-	buff.WriteString(format2(GetMinute(t)))
-	buff.WriteString(":")
-	buff.WriteString(format2(GetSecond(t)))
-	return buff.String()
+	return fmt.Sprintf("%s:%s:%s",
+		format2(int64(GetHour(t))), format2(int64(GetMinute(t))), format2(int64(GetSecond(t))))
 }
 
-// GetLongLongDateString gets short date format like '2018-11-11 12:12:12,233'.
-func GetLongLongDateString(t time.Time) string {
-	var buff bytes.Buffer
-	buff.WriteString(strconv.Itoa(GetYear(t)))
-	buff.WriteString("-")
-	buff.WriteString(format2(GetMonth(t)))
-	buff.WriteString("-")
-	buff.WriteString(format2(GetDay(t)))
-	buff.WriteString(" ")
-	buff.WriteString(format2(GetHour(t)))
-	buff.WriteString(":")
-	buff.WriteString(format2(GetMinute(t)))
-	buff.WriteString(":")
-	buff.WriteString(format2(GetSecond(t)))
-	buff.WriteString(",")
-	buff.WriteString(format3(GetMillionSecond(t)))
-	return buff.String()
+// GetShortCNDateString gets time format like '12时12分12秒'.
+func GetShortCNDateString(t time.Time) string {
+	return fmt.Sprintf("%s时%s分%s秒",
+		format2(int64(GetHour(t))), format2(int64(GetMinute(t))), format2(int64(GetSecond(t))))
+}
+
+// GetLongFullDateString gets short date format like '2018-11-11 12:12:12,233'.
+func GetLongFullDateString(t time.Time) string {
+	return fmt.Sprintf("%d-%s-%s %s:%s:%s.%s",
+		GetYear(t), format2(int64(GetMonth(t))), format2(int64(GetDay(t))),
+		format2(int64(GetHour(t))), format2(int64(GetMinute(t))), format2(int64(GetSecond(t))), format3(int64(GetMillionSecond(t))),
+	)
 }
 
 // GetTimestamp gets current timestamp in milliseconds.
@@ -79,11 +66,9 @@ func GetTimestamp(t time.Time) int64 {
 	return t.UnixNano() / 1e6
 }
 
-// CreateTime returns the local Time corresponding to the given Unix time,
-// sec seconds and nsec nanoseconds since January 1, 1970 UTC. It is valid to pass nsec outside the range [0, 999999999].
-// Not all sec values have a corresponding time value. One such value is 1<<63-1 (the largest int64 value).
+// CreateTime creates a time from a millis second.
 func CreateTime(millis int64) time.Time {
-	return time.Unix(millis, 0)
+	return time.Unix(millis/1000, 0)
 }
 
 // GetNanosecond gets current timestamp in Nanosecond.
@@ -121,41 +106,89 @@ func GetSecond(t time.Time) int {
 	return t.Second()
 }
 
+// GetWeekDay 获取当前日期是星期几
+func GetWeekDay(t time.Time) string {
+	return t.Weekday().String()
+}
+
+// GetCNWeekDay 获取当前日期是星期几
+func GetCNWeekDay(t time.Time) string {
+	switch t.Weekday() {
+	case time.Sunday:
+		return "周日"
+	case time.Monday:
+		return "周一"
+	case time.Tuesday:
+		return "周二"
+	case time.Wednesday:
+		return "周三"
+	case time.Thursday:
+		return "周四"
+	case time.Friday:
+		return "周五"
+	default:
+		return "周六"
+	}
+}
+
 // GetMillionSecond gets millionSecond number.
 func GetMillionSecond(t time.Time) int {
 	return t.Nanosecond() / 1e6
 }
 
-func format2(input int) string {
-	if input < 10 {
-		return "0" + strconv.Itoa(input)
-	}
-	return strconv.Itoa(input)
+// ParseTimeFromRFC3339 解析时间格式：
+//
+// 2006-01-02T15:04:05Z
+func ParseTimeFromRFC3339(timeString string) (time.Time, error) {
+	return time.Parse(time.RFC3339, timeString)
 }
 
-func format3(input int) string {
-	if input < 10 {
-		return "00" + strconv.Itoa(input)
-	}
-	if input < 100 {
-		return "0" + strconv.Itoa(input)
-	}
-	return strconv.Itoa(input)
+// ParseTime 解析时间格式：
+//
+// 2006-01-02 15:04:05
+func ParseTime(timeString string) (time.Time, error) {
+	return time.Parse("2006-01-02 15:04:05", timeString)
 }
 
-// GetHumanReadableDuration gets a duration between times
-// and returns format like '01:12:31' (?hour:?minute:?second).
-func GetHumanReadableDuration(start time.Time, end time.Time) string {
-	v := GetTimestamp(end)/1000 - GetTimestamp(start)/1000 // seconds
-	h := v / 3600
-	m := v % 3600 / 60
-	s := v % 60
-	return format2(int(h)) + ":" + format2(int(m)) + ":" + format2(int(s))
+// ParseDate 解析时间格式：
+//
+// 2006-01-02
+func ParseDate(timeString string) (time.Time, error) {
+	return time.Parse("2006-01-02", timeString)
 }
 
-// GetLongHumanReadableDuration gets a duration between times
-// and returns format like '1d 3h 12m 11s' (?day ?hour ?minute ?second).
-func GetLongHumanReadableDuration(start time.Time, end time.Time) string {
-	v := int(GetTimestamp(end)/1000 - GetTimestamp(start)/1000) // seconds
-	return strconv.Itoa(v/86400) + "d " + strconv.Itoa(v%86400/3600) + "h " + strconv.Itoa(v%3600/60) + "m " + strconv.Itoa(v%60) + "s"
+func GetDuration(start, end time.Time) string {
+	val := (GetTimestamp(end) - GetTimestamp(start)) / 1000
+	if val < 60 {
+		return fmt.Sprintf("%ds", val)
+	}
+	if val < 3600 {
+		return fmt.Sprintf("%dm %ds", val/60, val%60)
+	}
+	if val < 86400 {
+		return fmt.Sprintf("%dh %dm %ds", val/3600, val%3600/60, val%60)
+	}
+	return fmt.Sprintf("%dd %dh %dm %ds", val/86400, val%86400/3600, val%3600/60, val%60)
+}
+
+func GetCNDuration(start, end time.Time) string {
+	val := (GetTimestamp(end) - GetTimestamp(start)) / 1000
+	if val < 60 {
+		return fmt.Sprintf("%d秒", val)
+	}
+	if val < 3600 {
+		return fmt.Sprintf("%d分%d秒", val/60, val%60)
+	}
+	if val < 86400 {
+		return fmt.Sprintf("%d小时%d分%d秒", val/3600, val%3600/60, val%60)
+	}
+	return fmt.Sprintf("%d天%d小时%d分%d秒", val/86400, val%86400/3600, val%3600/60, val%60)
+}
+
+func format2(input int64) string {
+	return fmt.Sprintf("%02d", input)
+}
+
+func format3(input int64) string {
+	return fmt.Sprintf("%03d", input)
 }

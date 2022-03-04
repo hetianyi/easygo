@@ -2,6 +2,7 @@ package timer
 
 import (
 	"github.com/hetianyi/easygo/base"
+	"github.com/hetianyi/easygo/logger"
 	"time"
 )
 
@@ -34,9 +35,9 @@ func Start(initialDelay time.Duration, fixedDelay time.Duration, fixedRate time.
 //
 // Note that fixedDelay is superior to fixedRate.
 func (t *Timer) tick(initialDelay time.Duration, fixedDelay time.Duration, fixedRate time.Duration, work func(t *Timer)) {
-	// logger.Debug("start timer")
+	logger.Debug("start timer")
 	defer func() {
-		// logger.Debug("stop timer")
+		logger.Debug("stop timer")
 	}()
 	time.Sleep(initialDelay)
 	if t.close {
@@ -52,7 +53,7 @@ func (t *Timer) tick(initialDelay time.Duration, fixedDelay time.Duration, fixed
 			base.Try(func() {
 				work(t)
 			}, func(i interface{}) {
-				//logger.Error("error execute timer job:", i)
+				logger.Error("error execute timer job:", i)
 			})
 			<-tim.C
 		}
@@ -64,7 +65,7 @@ func (t *Timer) tick(initialDelay time.Duration, fixedDelay time.Duration, fixed
 			base.Try(func() {
 				work(t)
 			}, func(i interface{}) {
-				//logger.Error("error execute timer job:", i)
+				logger.Error("error execute timer job:", i)
 			})
 			time.Sleep(fixedDelay)
 		}
