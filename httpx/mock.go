@@ -282,7 +282,7 @@ func (m *mock) Do() (interface{}, int, error) {
 	return ret, resp.StatusCode, err
 }
 
-// Do is the end of the mock chain,
+// Do1 is the end of the mock chain,
 // which will send the request and return the result.
 func (m *mock) Do1() (interface{}, *http.Response, error) {
 	paramsStr := string(encodeParameters(m.parameterMap))
@@ -475,25 +475,25 @@ func convertResponse(typeName string, response io.Reader, responseContainer inte
 		if err != nil {
 			return 0, err
 		}
-		return convert.StrToInt(string(bs))
+		return convert.StrToNumber(string(bs), convert.Int)
 	case "int64":
 		bs, err := ioutil.ReadAll(response)
 		if err != nil {
 			return 0, err
 		}
-		return convert.StrToInt64(string(bs))
+		return convert.StrToNumber(string(bs), convert.Int64)
 	case "float32":
 		bs, err := ioutil.ReadAll(response)
 		if err != nil {
 			return 0, err
 		}
-		return convert.StrToFloat32(string(bs))
+		return convert.StrToNumber(string(bs), convert.Float32)
 	case "float64":
 		bs, err := ioutil.ReadAll(response)
 		if err != nil {
 			return 0, err
 		}
-		return convert.StrToFloat64(string(bs))
+		return convert.StrToNumber(string(bs), convert.Float64)
 	case "bool":
 		bs, err := ioutil.ReadAll(response)
 		if err != nil {

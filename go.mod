@@ -1,6 +1,6 @@
 module github.com/hetianyi/easygo
 
-go 1.16
+go 1.18
 
 require (
 	github.com/beta/freetype v0.0.1
@@ -9,6 +9,7 @@ require (
 	github.com/json-iterator/go v1.1.12
 	github.com/logrusorgru/aurora v2.0.3+incompatible
 	github.com/satori/go.uuid v1.2.0
+	github.com/shopspring/decimal v1.3.1
 	golang.org/x/image v0.0.0-20211028202545-6944b10bf410
 	gopkg.in/check.v1 v1.0.0-20201130134442-10cb98267c6c // indirect
 )
