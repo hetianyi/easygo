@@ -65,7 +65,7 @@ func Test2(t *testing.T) {
 	randInt := ""
 	rnd := rand.New(rand.NewSource(time.Now().UnixNano()))
 	for i := 0; i < 3; i++ {
-		randInt += convert.NumberToStr(rnd.Intn(10))
+		randInt += convert.IntToStr(rnd.Intn(10))
 	}
 	fmt.Println("rand=", randInt)
 	var buffer bytes.Buffer
@@ -111,7 +111,7 @@ func createCRCFileID(instanceId string, crc32 string, fileSize uint64) string {
 	randInt := ""
 	rnd := rand.New(rand.NewSource(time.Now().UnixNano()))
 	for i := 0; i < 3; i++ {
-		randInt += convert.NumberToStr(rnd.Intn(10))
+		randInt += convert.IntToStr(rnd.Intn(10))
 	}
 	all := instanceId + timestamp + crc32 + fileSizeHex
 	return fmt.Sprintf("%s%s", base64.StdEncoding.EncodeToString([]byte(all)), randInt)
@@ -121,7 +121,7 @@ func createMD5FileID(instanceId string, md5 string) string {
 	randInt := ""
 	rnd := rand.New(rand.NewSource(time.Now().UnixNano()))
 	for i := 0; i < 3; i++ {
-		randInt += convert.NumberToStr(rnd.Intn(10))
+		randInt += convert.IntToStr(rnd.Intn(10))
 	}
 	all := instanceId + md5
 	return fmt.Sprintf("%s%s", base64.StdEncoding.EncodeToString([]byte(all)), randInt)
@@ -129,6 +129,6 @@ func createMD5FileID(instanceId string, md5 string) string {
 
 func Test4(t *testing.T) {
 	for i := 0; i < 100; i++ {
-		fmt.Println(base64.StdEncoding.EncodeToString([]byte(convert.NumberToStr(i))))
+		fmt.Println(base64.StdEncoding.EncodeToString([]byte(convert.IntToStr(i))))
 	}
 }
