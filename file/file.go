@@ -106,6 +106,16 @@ func Delete(path string) bool {
 	return nil == err
 }
 
+// DeleteFile deletes a file or directory.
+// special: it returns true if the file not exists.
+func DeleteFile(f *os.File) bool {
+	if !Exists(f.Name()) {
+		return true
+	}
+	err := os.Remove(f.Name())
+	return nil == err
+}
+
 // DeleteAll deletes file or directory.
 // if it is a directory, it will try to delete all files below.
 // special: it returns true if the file not exists.
