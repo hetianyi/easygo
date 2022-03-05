@@ -8,12 +8,8 @@ import (
 	"container/list"
 	"crypto/md5"
 	"encoding/hex"
-	"fmt"
-	"github.com/hetianyi/easygo/convert"
 	"io"
-	"math/rand"
 	"net"
-	"os"
 	"strconv"
 	"strings"
 )
@@ -113,7 +109,7 @@ func LimitRange(value interface{}, defaultValue interface{}, rangeValues ...inte
 	return defaultValue
 }
 
-// GetPreferredIPAddress get self ip address by preferred interface
+// GetMyAddress get self ip address by preferred interface
 func GetMyAddress(preferredNetworks ...string) string {
 	addresses, _ := net.Interfaces()
 	var ret list.List
@@ -180,17 +176,5 @@ func scan(itf net.Interface) *IP {
 	return &IP{
 		Address: addr.IP.String(),
 		Name:    itf.Name,
-	}
-}
-
-// BlockTest blocks test methods.
-func BlockTest() {
-	listener, err := net.Listen("tcp", "127.0.0.1:"+convert.IntToStr(10000+rand.Intn(10000)))
-	if err != nil {
-		os.Exit(3)
-	}
-	for {
-		_, err := listener.Accept()
-		fmt.Println(err)
 	}
 }
