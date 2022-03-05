@@ -1,55 +1,117 @@
-package convert_test
+package convert
 
 import (
 	"fmt"
-	"github.com/hetianyi/easygo/convert"
-	"os"
+	"github.com/hetianyi/easygo/logger"
+	"reflect"
 	"testing"
 )
 
-func TestAll(t *testing.T) {
-	fmt.Println(convert.IntToStr(1))
-	fmt.Println(convert.UintToStr(1))
+func TestNumberToStr(t *testing.T) {
 
-	fmt.Println(convert.Int8ToStr(1))
-	fmt.Println(convert.Uint8ToStr(1))
+	logger.Info("byte ---------------------------")
+	var a1 byte = 1
+	var a2 byte = 255
+	fmt.Println(NumberToStr(a1))
+	fmt.Println(NumberToStr(a2))
 
-	fmt.Println(convert.Int16ToStr(1))
-	fmt.Println(convert.Uint16ToStr(65535))
+	logger.Info("int ---------------------------")
+	var b1 int = 16547
+	var b2 int = -23123123
+	fmt.Println(NumberToStr(b1))
+	fmt.Println(NumberToStr(b2))
 
-	fmt.Println(convert.Int32ToStr(1))
-	fmt.Println(convert.Uint32ToStr(1))
+	logger.Info("int8 ---------------------------")
+	var d1 int8 = 100
+	var d2 int8 = -100
+	fmt.Println(NumberToStr(d1))
+	fmt.Println(NumberToStr(d2))
 
-	fmt.Println(convert.Int64ToStr(1))
-	fmt.Println(convert.Uint64ToStr(1))
+	logger.Info("int16 ---------------------------")
+	var e1 int16 = 500
+	var e2 int16 = -5000
+	fmt.Println(NumberToStr(e1))
+	fmt.Println(NumberToStr(e2))
 
-	fmt.Println(convert.ByteToStr(112))
-	fmt.Println(convert.Float32ToStr(12.11))
-	fmt.Println(convert.Float64ToStr(12.11))
-	fmt.Println(convert.BoolToStr(true), convert.BoolToStr(false))
+	logger.Info("int32 ---------------------------")
+	var f1 int32 = 500
+	var f2 int32 = -5000
+	fmt.Println(NumberToStr(f1))
+	fmt.Println(NumberToStr(f2))
 
-	fmt.Println(convert.StrToInt("123"))
-	fmt.Println(convert.StrToUint("123"))
+	logger.Info("int64 ---------------------------")
+	var g1 int64 = 5007893534534534
+	var g2 int64 = -500785345345345345
+	fmt.Println(NumberToStr(g1))
+	fmt.Println(NumberToStr(g2))
 
-	fmt.Println(convert.StrToInt8("123"))
-	fmt.Println(convert.StrToUint8("123"))
+	logger.Info("uint ---------------------------")
+	var h1 uint = 16512313
+	fmt.Println(NumberToStr(h1))
 
-	fmt.Println(convert.StrToInt16("123"))
-	fmt.Println(convert.StrToUint16("123"))
+	logger.Info("uint8 ---------------------------")
+	var i1 uint8 = 165
+	fmt.Println(NumberToStr(i1))
 
-	fmt.Println(convert.StrToInt32("123"))
-	fmt.Println(convert.StrToUint32("123"))
+	logger.Info("uint16 ---------------------------")
+	var j1 uint16 = 16567
+	fmt.Println(NumberToStr(j1))
 
-	fmt.Println(convert.StrToInt64("123"))
-	fmt.Println(convert.StrToUint64("123"))
+	logger.Info("uint32 ---------------------------")
+	var k1 uint32 = 1656733242
+	fmt.Println(NumberToStr(k1))
 
-	fmt.Println(convert.StrToByte("123"))
-	fmt.Println(convert.StrToFloat32("123.123333"))
-	fmt.Println(convert.StrToFloat64("123.123333"))
-	fmt.Println(convert.StrToBool("true"))
-	fmt.Println(convert.StrToBool("false"))
+	logger.Info("uint64 ---------------------------")
+	var l1 uint64 = 5007853453453453452
+	fmt.Println(NumberToStr(l1))
 
-	f, _ := os.Open("D:/zhigan.png")
-	info, _ := f.Stat()
-	fmt.Println(info.Name())
+	logger.Info("float32 ---------------------------")
+	var m1 float32 = 5052.789123123
+	fmt.Println(NumberToStr(m1))
+
+	logger.Info("float64 ---------------------------")
+	var n1 float64 = 50.78911231231231
+	fmt.Println(NumberToStr(n1))
+}
+
+func TestStrToNumber(t *testing.T) {
+
+	n0, _ := StrToNumber("101", Byte)
+	fmt.Println(n0, reflect.TypeOf(n0))
+
+	n1, _ := StrToNumber("101", Int)
+	fmt.Println(n1, reflect.TypeOf(n1))
+
+	n2, _ := StrToNumber("101", Uint)
+	fmt.Println(n2, reflect.TypeOf(n2))
+
+	n3, _ := StrToNumber("101", Int8)
+	fmt.Println(n3, reflect.TypeOf(n3))
+
+	n4, _ := StrToNumber("101", Uint8)
+	fmt.Println(n4, reflect.TypeOf(n4))
+
+	n5, _ := StrToNumber("101", Int16)
+	fmt.Println(n5, reflect.TypeOf(n5))
+
+	n6, _ := StrToNumber("101", Uint16)
+	fmt.Println(n6, reflect.TypeOf(n6))
+
+	n7, _ := StrToNumber("101", Int32)
+	fmt.Println(n7, reflect.TypeOf(n7))
+
+	n8, _ := StrToNumber("101", Uint32)
+	fmt.Println(n8, reflect.TypeOf(n8))
+
+	n9, _ := StrToNumber("101", Int64)
+	fmt.Println(n9, reflect.TypeOf(n9))
+
+	n10, _ := StrToNumber("101", Uint64)
+	fmt.Println(n10, reflect.TypeOf(n10))
+
+	n11, _ := StrToNumber("101.567", Float32)
+	fmt.Println(n11, reflect.TypeOf(n11))
+
+	n12, _ := StrToNumber("101123.4123", Float64)
+	fmt.Println(n12, reflect.TypeOf(n12))
 }
