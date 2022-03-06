@@ -1,0 +1,24 @@
+server:
+  host: 0.0.0.0
+  port: 8080
+
+mysql:
+  conn: root:123456@tcp(127.0.0.1:3306)/gin?charset=utf8&parseTime=True&loc=Local
+  maxIdleConns: 5
+  maxOpenConns: 100
+  connMaxLifetime: 3600
+
+redis:
+  host: 127.0.0.1
+  port: 6379
+  pass: 123456
+  db: 0
+
+captcha:
+  width: 100
+  height: 40
+  seed: 1234567890qwertyuioplkjhgfdsazxcvbnm
+  length: 4
+  noiseCount: 10
+  fontName: chromohv.ttf
+  background: 255, 255, 255, 255
