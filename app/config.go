@@ -3,9 +3,12 @@ package app
 import (
 	_ "github.com/go-redis/redis"
 	_ "github.com/hetianyi/base64Captcha"
+	"github.com/hetianyi/easygo/base"
+	"github.com/hetianyi/easygo/file"
 	_ "gopkg.in/yaml.v2"
 	_ "gorm.io/driver/mysql"
 	_ "gorm.io/gorm"
+	"io"
 )
 
 // Server 为http服务器的配置
@@ -59,4 +62,34 @@ type Config struct {
 	RedisConfig   RedisConfig   `yaml:"redis"`
 	MysqlConfig   MysqlConfig   `yaml:"mysql"`
 	CaptchaConfig CaptchaConfig `yaml:"captcha"`
+}
+
+type App struct {
+	Config *Config
+}
+
+func NewApp() *App {
+	return &App{
+		Config: &Config{},
+	}
+}
+
+func (a *App) Load(path string) error {
+	configFile, err := file.GetFile(path)
+	if err != nil {
+		//logger.Fatal("无法加载配置文件\"", path, "\": ", err)
+		return err
+	}
+	content, err := io.ReadAll(configFile)
+	if err != nil {
+		//logger.Fatal("无法读取配置文件\"", path, "\": ", err)
+		return err
+	}
+	a.Config = &Config{}
+	err = base.ParseYamlFromString(string(content), a.Config)
+	if err != nil {
+		//logger.Fatal("配置文件错误: ", err)
+		return err
+	}
+	return nil
 }
