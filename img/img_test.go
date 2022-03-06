@@ -14,10 +14,6 @@ import (
 	"testing"
 )
 
-func init() {
-	logger.Init(nil)
-}
-
 func TestImage_Resize(t *testing.T) {
 	im, err := img.OpenLocalFile("E:\\test\\1.jpg") // 1900x1283
 	if err != nil {

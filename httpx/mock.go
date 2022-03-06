@@ -442,25 +442,25 @@ func convertResponse(typeName string, response io.Reader, responseContainer inte
 		if err != nil {
 			return 0, err
 		}
-		return convert.StrToNumber(string(bs), convert.Int)
+		return convert.StrToInt(string(bs))
 	case "int64":
 		bs, err := ioutil.ReadAll(response)
 		if err != nil {
 			return 0, err
 		}
-		return convert.StrToNumber(string(bs), convert.Int64)
+		return convert.StrToInt64(string(bs))
 	case "float32":
 		bs, err := ioutil.ReadAll(response)
 		if err != nil {
 			return 0, err
 		}
-		return convert.StrToNumber(string(bs), convert.Float32)
+		return convert.StrToFloat32(string(bs))
 	case "float64":
 		bs, err := ioutil.ReadAll(response)
 		if err != nil {
 			return 0, err
 		}
-		return convert.StrToNumber(string(bs), convert.Float64)
+		return convert.StrToFloat64(string(bs))
 	case "bool":
 		bs, err := ioutil.ReadAll(response)
 		if err != nil {
