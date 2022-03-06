@@ -17,24 +17,44 @@ import (
 )
 
 const (
-	METHOD_GET                         = "GET"
-	METHOD_POST                        = "POST"
-	METHOD_TRACE                       = "TRACE"
-	METHOD_DELETE                      = "DELETE"
-	METHOD_PUT                         = "PUT"
-	METHOD_OPTIONS                     = "OPTIONS"
-	METHOD_HEAD                        = "HEAD"
-	METHOD_CONNECT                     = "CONNECT"
-	CONTENT_TYPE_X_WWW_FORM_URLENCODED = "application/x-www-form-urlencoded"
-	CONTENT_TYPE_JSON                  = "application/json"
-	CONTENT_TYPE_MULTIPART             = "multipart/form-data"
+	MethodGet                 = "GET"
+	MethodPost                = "POST"
+	MethodTrace               = "TRACE"
+	MethodDelete              = "DELETE"
+	MethodPut                 = "PUT"
+	MethodOptions             = "OPTIONS"
+	MethodHead                = "HEAD"
+	MethodConnect             = "CONNECT"
+	ContentTypeFormUrlEncoded = "application/x-www-form-urlencoded"
+	ContentTypeJson           = "application/json"
+	ContentTypeFormMultipart  = "multipart/form-data"
 )
 
 var (
-	httpClient           *http.Client
 	defaultHeaders       = make(map[string]string, 10)
 	allowedResponseTypes = make(map[string]bool)
+	defaultTimeout       = time.Second * 30
 )
+
+type FormItemType int
+
+const (
+	FormItemTypeField FormItemType = iota
+	FormItemTypeFile
+)
+
+const (
+	multipartBodyParamType         = "[]httpx.FormItem"
+	urlencodedBodyOrQueryParamType = "map[string][]string"
+)
+
+type FormItem struct {
+	Type       FormItemType
+	Name       string
+	Value      string
+	FileName   string
+	FileReader io.Reader
+}
 
 func init() {
 	allowedResponseTypes["int"] = true
@@ -47,143 +67,126 @@ func init() {
 	allowedResponseTypes["map"] = true
 	allowedResponseTypes["nil"] = true
 	allowedResponseTypes["io.Writer"] = true
-
-	httpClient = &http.Client{
-		Timeout: time.Second * 20,
-	}
-}
-
-// SetTTL sets http client request timeout value.
-// Default timeout value is 20s.
-// A Timeout of zero means no timeout.
-func SetTTL(timeout time.Duration) {
-	httpClient.Timeout = timeout
 }
 
 // mock is a fake http request instance.
 type mock struct {
+	httpClient        *http.Client
 	url               string
 	method            string
-	headers           map[string]string
+	headers           map[string][]string
 	contentType       string
 	parameterMap      map[string][]string
 	body              []byte
+	multipartFormBody []FormItem
 	request           http.Request
 	response          http.Response
-	multipartFiller   func(writer *multipart.Writer)
 	responseContainer interface{}
-	callback          func(status int, response []byte)
 	successCodes      []int
 }
 
 // Mock returns an initialized mock.
 func Mock() *mock {
 	return &mock{
-		method:            METHOD_GET,
-		headers:           map[string]string{"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/71.0.3578.98 Safari/537.36"},
-		contentType:       CONTENT_TYPE_X_WWW_FORM_URLENCODED,
+		httpClient: &http.Client{
+			Timeout: defaultTimeout,
+		},
+		headers: map[string][]string{
+			"User-Agent": {"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/71.0.3578.98 Safari/537.36"},
+		},
+		contentType:       ContentTypeJson,
 		successCodes:      []int{http.StatusOK},
 		responseContainer: "",
 		parameterMap:      make(map[string][]string),
 	}
 }
 
-// URL sets the mock url.
-func (m *mock) URL(url string) *mock {
-	m.url = url
-	return m
-}
-
-// Header adds an http header to the mock.
+// Header adds a http header to the mock.
 func (m *mock) Header(name, value string) *mock {
-	m.headers[name] = value
+	if !checkHeaderExist(m.headers[name], value) {
+		m.headers[name] = append(m.headers[name], value)
+	}
 	return m
 }
 
 // Headers adds many http headers to the mock.
 func (m *mock) Headers(headers map[string]string) *mock {
-	for k, v := range m.headers {
-		m.headers[k] = v
+	for k, v := range headers {
+		if !checkHeaderExist(m.headers[k], v) {
+			m.headers[k] = append(m.headers[k], v)
+		}
 	}
 	return m
 }
 
+func checkHeaderExist(vals []string, value string) bool {
+	for _, v := range vals {
+		if v == value {
+			return true
+		}
+	}
+	return false
+}
+
 // ContentType sets ContentType of the mock.
 func (m *mock) ContentType(contentType string) *mock {
-	if strings.HasPrefix(contentType, CONTENT_TYPE_X_WWW_FORM_URLENCODED) ||
-		strings.HasPrefix(contentType, CONTENT_TYPE_JSON) ||
-		strings.HasPrefix(contentType, CONTENT_TYPE_MULTIPART) {
+	if strings.HasPrefix(contentType, ContentTypeFormUrlEncoded) ||
+		strings.HasPrefix(contentType, ContentTypeJson) ||
+		strings.HasPrefix(contentType, ContentTypeFormMultipart) {
 		m.contentType = contentType
 	} else {
-		panic(errors.New("not supported contentType: '" + contentType +
-			"', contentType is currently only support " + "'" + CONTENT_TYPE_X_WWW_FORM_URLENCODED +
-			"', '" + CONTENT_TYPE_MULTIPART + "' and '" + CONTENT_TYPE_JSON + "'"))
+		panic(errors.New("not supported ContentType: '" + contentType +
+			"', ContentType is currently only support " + "'" + ContentTypeFormUrlEncoded +
+			"', '" + ContentTypeFormMultipart + "' and '" + ContentTypeJson + "'"))
 	}
 	return m
 }
 
 // Parameters add parameters on the request url.
 func (m *mock) Parameters(params map[string]string) *mock {
-	if params != nil && len(params) > 0 {
-		for k, v := range params {
-			oldV := m.parameterMap[k]
-			oldLen := len(oldV)
-			if oldV == nil {
-				oldV = make([]string, oldLen+1)
-			}
-			oldV[oldLen] = v
-			m.parameterMap[k] = oldV
-		}
+	for k, v := range params {
+		m.parameterMap[k] = append(m.parameterMap[k], v)
 	}
 	return m
 }
 
 // Parameter add a parameter on the request url.
 func (m *mock) Parameter(name, value string) *mock {
-	oldV := m.parameterMap[name]
-	oldLen := len(oldV)
-	if oldV == nil {
-		oldV = make([]string, oldLen+1)
-	}
-	oldV[oldLen] = value
-	m.parameterMap[name] = oldV
+	m.parameterMap[name] = append(m.parameterMap[name], value)
 	return m
 }
 
-// Body must be a type like map[string][]string or custom struct.
+// RequestBody 设置请求Body.
 //
-// if contentType is 'application/x-www-form-urlencoded' then type of body must be type map[string][]string,
+//  如果 ContentType 是 'application/x-www-form-urlencoded'，那么请求Body的类型必须是 map[string][]string,
 //
-// if contentType is 'application/json' then type of body could be any.
-func (m *mock) Body(body interface{}) *mock {
+//  如果 ContentType 是 'multipart/form-data'，那么请求Body的类型必须是 TODO,
+//
+//  如果 ContentType 是 'application/json'，那么请求Body的类型可以是任意自定义struct.
+func (m *mock) RequestBody(body interface{}) *mock {
 	if body == nil {
 		m.body = nil
 		return m
 	}
 	bodyType := reflect.TypeOf(body).String()
-	if m.contentType == CONTENT_TYPE_JSON {
-		jv, _ := json.Marshal(body)
-		m.body = jv
-	} else if m.contentType == CONTENT_TYPE_MULTIPART {
-		if bodyType != "map[string][]string" {
-			panic(errors.New("body type must be 'map[string][]string' if contentType is 'application/x-www-form-urlencoded'"))
+	if m.contentType == ContentTypeJson {
+		jv, err := json.Marshal(body)
+		if err != nil {
+			panic(err)
 		}
-		m.body = encodeParameters(body.(map[string][]string))
+		m.body = jv
+	} else if m.contentType == ContentTypeFormMultipart {
+		// processes it in func Do()
+		if bodyType != multipartBodyParamType {
+			panic(errors.New("request body type must be '" + multipartBodyParamType + "' if ContentType is '" + ContentTypeFormMultipart + "'"))
+		}
+		m.multipartFormBody = body.([]FormItem)
 	} else {
-		if bodyType != "map[string][]string" {
-			panic(errors.New("body type must be 'map[string][]string' if contentType is 'application/x-www-form-urlencoded'"))
+		if bodyType != urlencodedBodyOrQueryParamType {
+			panic(errors.New("body type must be '" + urlencodedBodyOrQueryParamType + "' if ContentType is '" + ContentTypeFormUrlEncoded + "'"))
 		}
 		m.body = encodeParameters(body.(map[string][]string))
 	}
-	return m
-}
-
-// Multipart add multipart content to request body.
-//
-// if Multipart() is called, the request content will set to 'multipart/form-data' automatically.
-func (m *mock) Multipart(multipartFiller func(writer *multipart.Writer)) *mock {
-	m.multipartFiller = multipartFiller
-	m.method = "POST"
 	return m
 }
 
@@ -191,19 +194,13 @@ func (m *mock) Multipart(multipartFiller func(writer *multipart.Writer)) *mock {
 //
 // response type must be one of:
 //
-// int int64 float32 float64 bool string or pointer of a struct.
+// int int64 float32 float64 bool string map nil or pointer of a struct.
 func (m *mock) Success(response interface{}, successCodes ...int) *mock {
 	m.responseContainer = response
 	m.successCodes = successCodes
 	if !allowedResponseTypes[checkResponseType(response)] {
 		panic("response type not allowed")
 	}
-	return m
-}
-
-// Error handles error during the mock request.
-func (m *mock) Error(callback func(status int, response []byte)) *mock {
-	m.callback = callback
 	return m
 }
 
@@ -216,58 +213,77 @@ func (m *mock) Do() (interface{}, int, error) {
 	var mw *multipart.Writer
 	var pipeReader *io.PipeReader
 	var pipeWriter *io.PipeWriter
-	if m.multipartFiller != nil {
+
+	// 如果是FormMultipart，则将提供请求Body
+	if m.contentType == ContentTypeFormMultipart && len(m.multipartFormBody) > 0 {
 		isMultipart = true
 		pipeReader, pipeWriter = io.Pipe()
 		mw = multipart.NewWriter(pipeWriter)
+
 		go func() {
 			defer pipeWriter.Close()
 			defer mw.Close()
-			m.multipartFiller(mw)
+			for _, item := range m.multipartFormBody {
+				if item.Type == FormItemTypeFile {
+					o, err := mw.CreateFormFile(item.Name, item.FileName)
+					if err != nil {
+						panic(err)
+					}
+					_, err = io.Copy(o, item.FileReader)
+					if err != nil {
+						panic(err)
+					}
+				} else {
+					o, err := mw.CreateFormField(item.Name)
+					if err != nil {
+						panic(err)
+					}
+					_, err = o.Write([]byte(item.Value))
+					if err != nil {
+						panic(err)
+					}
+				}
+			}
 		}()
 	}
 
-	req, err := http.NewRequest(m.method, base.TValue(paramsStr == "", m.url, m.url+"?"+paramsStr).(string),
-		base.TValue(isMultipart, pipeReader, bytes.NewReader(m.body)).(io.Reader))
+	// 确定请求的BodyReader
+	var bodyReader io.Reader
+	if isMultipart {
+		bodyReader = pipeReader
+	} else {
+		bodyReader = bytes.NewReader(m.body)
+	}
+
+	// 构造请求
+	req, err := http.NewRequest(m.method, base.TValue(paramsStr == "", m.url, m.url+"?"+paramsStr).(string), bodyReader)
 	if err != nil {
 		return m.responseContainer, 0, err
 	}
-	for k, v := range m.headers {
-		req.Header.Add(k, v)
-	}
+
+	// 设置请求headers
+	req.Header = m.headers
 	if isMultipart {
 		req.Header.Set("Content-Type", mw.FormDataContentType())
 	}
 
-	resp, err := httpClient.Do(req)
+	resp, err := m.httpClient.Do(req)
 	if err != nil {
 		return m.responseContainer, 0, err
 	}
 
+	// 判断请求是否成功
 	if !m.isSuccess(resp.StatusCode) {
-		bs, err := ioutil.ReadAll(resp.Body)
+		_, err := ioutil.ReadAll(resp.Body)
 		if err != nil {
 			return m.responseContainer, resp.StatusCode, err
 		}
-		if m.callback != nil {
-			m.callback(resp.StatusCode, bs)
-		}
 		return m.responseContainer, resp.StatusCode, nil
 	}
-	decodeUseGzip := false
-	if resp.Header != nil {
-		for k, v := range resp.Header {
-			// fmt.Println(k, v[0])
-			if strings.ToLower(k) == "content-encoding" {
-				if v != nil && len(v) > 0 {
-					if v[0] == "gzip" {
-						decodeUseGzip = true
-						break
-					}
-				}
-			}
-		}
-	}
+
+	// 处理gzp结果
+	decodeUseGzip := isGzipContentType(resp.Header)
+
 	var r io.Reader
 	if decodeUseGzip {
 		reader, err := gzip.NewReader(resp.Body)
@@ -282,139 +298,93 @@ func (m *mock) Do() (interface{}, int, error) {
 	return ret, resp.StatusCode, err
 }
 
-// Do1 is the end of the mock chain,
-// which will send the request and return the result.
-func (m *mock) Do1() (interface{}, *http.Response, error) {
-	paramsStr := string(encodeParameters(m.parameterMap))
-
-	isMultipart := false
-	var mw *multipart.Writer
-	var pipeReader *io.PipeReader
-	var pipeWriter *io.PipeWriter
-	if m.multipartFiller != nil {
-		isMultipart = true
-		pipeReader, pipeWriter = io.Pipe()
-		mw = multipart.NewWriter(pipeWriter)
-		go func() {
-			defer pipeWriter.Close()
-			defer mw.Close()
-			m.multipartFiller(mw)
-		}()
-	}
-
-	req, err := http.NewRequest(m.method, base.TValue(paramsStr == "", m.url, m.url+"?"+paramsStr).(string),
-		base.TValue(isMultipart, pipeReader, bytes.NewReader(m.body)).(io.Reader))
-	if err != nil {
-		return m.responseContainer, nil, err
-	}
-	for k, v := range m.headers {
-		req.Header.Add(k, v)
-	}
-	if isMultipart {
-		req.Header.Set("Content-Type", mw.FormDataContentType())
-	}
-
-	resp, err := httpClient.Do(req)
-	if err != nil {
-		return m.responseContainer, nil, err
-	}
-
-	if !m.isSuccess(resp.StatusCode) {
-		bs, err := ioutil.ReadAll(resp.Body)
-		if err != nil {
-			return m.responseContainer, resp, err
-		}
-		if m.callback != nil {
-			m.callback(resp.StatusCode, bs)
-		}
-		return m.responseContainer, resp, nil
-	}
-	decodeUseGzip := false
-	if resp.Header != nil {
-		for k, v := range resp.Header {
-			// fmt.Println(k, v[0])
-			if strings.ToLower(k) == "content-encoding" {
-				if v != nil && len(v) > 0 {
-					if v[0] == "gzip" {
-						decodeUseGzip = true
-						break
-					}
+func isGzipContentType(header http.Header) bool {
+	for k, v := range header {
+		if strings.ToLower(k) == "content-encoding" {
+			if len(v) > 0 {
+				if strings.ToLower(v[0]) == "gzip" {
+					return true
 				}
 			}
 		}
 	}
-	var r io.Reader
-	if decodeUseGzip {
-		reader, err := gzip.NewReader(resp.Body)
-		if err != nil {
-			return m.responseContainer, resp, err
-		}
-		r = reader
-	} else {
-		r = resp.Body
-	}
-	ret, err := convertResponse(checkResponseType(m.responseContainer), r, m.responseContainer)
-	return ret, resp, err
+	return false
 }
 
 // Get sets http method to GET.
-func (m *mock) Get() *mock {
-	m.method = METHOD_GET
+func (m *mock) Get(url string) *mock {
+	m.method = MethodGet
+	m.url = url
 	return m
 }
 
 // Post sets http method to Post.
-func (m *mock) Post() *mock {
-	m.method = METHOD_POST
+func (m *mock) Post(url string) *mock {
+	m.method = MethodPost
+	m.url = url
 	return m
 }
 
 // Options sets http method to Options.
-func (m *mock) Options() *mock {
-	m.method = METHOD_OPTIONS
+func (m *mock) Options(url string) *mock {
+	m.method = MethodOptions
+	m.url = url
 	return m
 }
 
 // Head sets http method to Head.
-func (m *mock) Head() *mock {
-	m.method = METHOD_HEAD
+func (m *mock) Head(url string) *mock {
+	m.method = MethodHead
+	m.url = url
 	return m
 }
 
 // Put sets http method to Put.
-func (m *mock) Put() *mock {
-	m.method = METHOD_PUT
+func (m *mock) Put(url string) *mock {
+	m.method = MethodPut
+	m.url = url
 	return m
 }
 
 // Delete sets http method to Delete.
-func (m *mock) Delete() *mock {
-	m.method = METHOD_DELETE
+func (m *mock) Delete(url string) *mock {
+	m.method = MethodDelete
+	m.url = url
 	return m
 }
 
 // Connect sets http method to Connect.
-func (m *mock) Connect() *mock {
-	m.method = METHOD_CONNECT
+func (m *mock) Connect(url string) *mock {
+	m.method = MethodConnect
+	m.url = url
 	return m
 }
 
 // Trace sets http method to Trace.
-func (m *mock) Trace() *mock {
-	m.method = METHOD_TRACE
+func (m *mock) Trace(url string) *mock {
+	m.method = MethodTrace
+	m.url = url
 	return m
+}
+
+// SetTTL sets http client request timeout value.
+// Default timeout value is 20s.
+// A Timeout of zero means no timeout.
+func (m *mock) SetTTL(timeout time.Duration) {
+	m.httpClient.Timeout = timeout
 }
 
 // encodeParameters encodes parameters to the pattern of 'a=xx&b=xx'.
 func encodeParameters(params map[string][]string) []byte {
-	if params == nil || len(params) == 0 {
+	if len(params) == 0 {
 		return []byte{}
 	}
 	var buffer bytes.Buffer
 	for k, vl := range params {
-		if vl == nil || len(vl) == 0 {
+		if len(vl) == 0 {
 			buffer.WriteString(k)
 			buffer.WriteString("=")
+			buffer.WriteString("&")
 			continue
 		}
 		for i, v := range vl {
@@ -425,18 +395,15 @@ func encodeParameters(params map[string][]string) []byte {
 				buffer.WriteString("&")
 			}
 		}
-		buffer.WriteString("&")
 	}
 	return buffer.Bytes()
 }
 
 // isSuccess determines whether the request is success.
 func (m *mock) isSuccess(code int) bool {
-	if m.successCodes != nil && len(m.successCodes) > 0 {
-		for _, v := range m.successCodes {
-			if v == code {
-				return true
-			}
+	for _, v := range m.successCodes {
+		if v == code {
+			return true
 		}
 	}
 	return code == http.StatusOK
@@ -465,8 +432,8 @@ func checkResponseType(resp interface{}) string {
 func convertResponse(typeName string, response io.Reader, responseContainer interface{}) (interface{}, error) {
 	switch typeName {
 	case "nil":
-		bs, err := ioutil.ReadAll(response)
-		return string(bs), err
+		_, err := ioutil.ReadAll(response)
+		return nil, err
 	case "io.Writer":
 		io.Copy(responseContainer.(io.Writer), response)
 		return response, nil
@@ -506,14 +473,7 @@ func convertResponse(typeName string, response io.Reader, responseContainer inte
 			return 0, err
 		}
 		return string(bs), nil
-	case "map":
-		bs, err := ioutil.ReadAll(response)
-		if err != nil {
-			return 0, err
-		}
-		err = json.Unmarshal(bs, responseContainer)
-		return responseContainer, err
-	case "struct":
+	case "map", "struct":
 		bs, err := ioutil.ReadAll(response)
 		if err != nil {
 			return 0, err
