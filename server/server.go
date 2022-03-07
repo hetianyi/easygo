@@ -84,7 +84,7 @@ func Start(serverConfig *app.Server) error {
 
 func addGroup(r *gin.Engine, group *gin.RouterGroup, g app.ApiGroup) {
 	if group == nil {
-		var mws = getGroupHandlers(g.MiddleWares)
+		var mws = getGroupMiddleWares(g.MiddleWares)
 		group = r.Group(g.Prefix, mws...)
 	}
 
@@ -97,7 +97,7 @@ func addGroup(r *gin.Engine, group *gin.RouterGroup, g app.ApiGroup) {
 		group.Handle(method, url, handler)
 	}
 	for _, subGroup := range g.ApiGroup {
-		var smws = getGroupHandlers(g.MiddleWares)
+		var smws = getGroupMiddleWares(g.MiddleWares)
 		sg := group.Group(subGroup.Prefix, smws...)
 		addGroup(r, sg, subGroup)
 	}
@@ -117,7 +117,7 @@ func parseRoute(route string) (method string, url string, err error) {
 	return
 }
 
-func getGroupHandlers(middlewares []string) []gin.HandlerFunc {
+func getGroupMiddleWares(middlewares []string) []gin.HandlerFunc {
 	var mws []gin.HandlerFunc
 	for _, m := range middlewares {
 		mw := getMiddleWareByName(m)
