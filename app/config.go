@@ -35,8 +35,8 @@ type Api struct {
 	// 例如：
 	//  GET /api/user
 	//  post /api/user/new
-	Route    string   `yaml:"route"`
-	Handlers []string `yaml:"handlers"` // API处理器名称列表
+	Route   string `yaml:"route"`
+	Handler string `yaml:"handler"` // API处理器名称列表
 }
 
 // RedisConfig 为redis的配置

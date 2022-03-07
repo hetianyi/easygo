@@ -6,35 +6,30 @@ server:
   middleWares:
     - MiddleWareCommon
   validators:
+  # 要使用路由配置，请将middleWares、api、和validators所在的包引入main方法所在的go文件
   groups:
     - prefix: /api/v1
       middleWares:
         - MiddleWareV1
       apis:
         - route: get /demo1
-          handlers:
-            - V1Demo1
+          handler: V1Demo1
         - route: get /demo2
-          handlers:
-            - V1Demo2
+          handler: V1Demo2
     - prefix: /api/v2
       middleWares:
         - MiddleWareV2
       apis:
         - route: get /demo1
-          handlers:
-            - V2Demo1
+          handler: V2Demo1
         - route: get /demo2
-          handlers:
-            - V2Demo2
+          handler: V2Demo2
       groups:
         - prefix: /sub
           middleWares:
             - MiddleWareV2
           apis:
             - route: get /v1
-              handlers:
-                - V2V1Demo1
+              handler: V2V1Demo1
             - route: get /v2
-              handlers:
-                - V2V1Demo2
+              handler: V2V1Demo2

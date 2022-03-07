@@ -9,25 +9,33 @@ server:
   validators:
     - validators1
     - validators2
+  # 要使用路由配置，请将middleWares、api、和validators所在的包引入main方法所在的go文件
   groups:
     - prefix: /api/v1
       middleWares:
-        - middleWares1
-        - middleWares2
+        - MiddleWareV1
       apis:
-        - route: /user
-          handlers:
-            - handlers1
-            - handlers2
+        - route: get /demo1
+          handler: V1Demo1
+        - route: get /demo2
+          handler: V1Demo2
     - prefix: /api/v2
       middleWares:
-        - middleWares1
-        - middleWares2
+        - MiddleWareV2
       apis:
-        - route: /user
-          handlers:
-            - handlers1
-            - handlers2
+        - route: get /demo1
+          handler: V2Demo1
+        - route: get /demo2
+          handler: V2Demo2
+      groups:
+        - prefix: /sub
+          middleWares:
+            - MiddleWareV2
+          apis:
+            - route: get /v1
+              handler: V2V1Demo1
+            - route: get /v2
+              handler: V2V1Demo2
 
 mysql:
   conn: root:123456@tcp(127.0.0.1:3306)/gin?charset=utf8&parseTime=True&loc=Local

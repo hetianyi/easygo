@@ -93,8 +93,8 @@ func addGroup(r *gin.Engine, group *gin.RouterGroup, g app.ApiGroup) {
 		if err != nil {
 			panic(err)
 		}
-		handlers := getApiHandlers(a.Handlers)
-		group.Handle(method, url, handlers...)
+		handler := getApiHandlers(a.Handler)
+		group.Handle(method, url, handler)
 	}
 	for _, subGroup := range g.ApiGroup {
 		var smws = getGroupHandlers(g.MiddleWares)
@@ -129,15 +129,10 @@ func getGroupHandlers(middlewares []string) []gin.HandlerFunc {
 	return mws
 }
 
-func getApiHandlers(handlerNames []string) []gin.HandlerFunc {
-	var handlers []gin.HandlerFunc
-	for _, n := range handlerNames {
-		handler := getApiHandlerByName(n)
-		if handler == nil {
-			logger.Warn("api handler not found: \"" + n + "\", are you forget to register it?")
-			continue
-		}
-		handlers = append(handlers, handler)
+func getApiHandlers(handlerName string) gin.HandlerFunc {
+	handler := getApiHandlerByName(handlerName)
+	if handler == nil {
+		logger.Warn("api handler not found: \"" + handlerName + "\", are you forget to register it?")
 	}
-	return handlers
+	return handler
 }
