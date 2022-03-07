@@ -13,8 +13,30 @@ import (
 
 // Server 为http服务器的配置
 type Server struct {
-	Host string `yaml:"host"` // HTTP服务监听地址
-	Port int    `yaml:"port"` // HTTP服务监听端口
+	Host         string     `yaml:"host"`         // HTTP服务监听地址
+	Port         int        `yaml:"port"`         // HTTP服务监听端口
+	GinMode      string     `yaml:"mode"`         // 服务启动模式：debug|release
+	UseGinLogger bool       `yaml:"useGinLogger"` // 是否开启gin的默认Logger
+	MiddleWares  []string   `yaml:"middleWares"`  // 中间件名称列表
+	Validators   []string   `yaml:"validators"`   // 校验器名称列表
+	ApiGroup     []ApiGroup `yaml:"groups"`       // 路由配置
+}
+
+type ApiGroup struct {
+	Prefix      string     `yaml:"prefix"`      // API组的路由前缀
+	MiddleWares []string   `yaml:"middleWares"` // API组的中间件名称列表
+	ApiGroup    []ApiGroup `yaml:"groups"`      // 路由配置
+	Apis        []Api      `yaml:"apis"`        // API组的API列表
+}
+
+type Api struct {
+	// 路由，格式为: <Method> <Route>
+	//
+	// 例如：
+	//  GET /api/user
+	//  post /api/user/new
+	Route    string   `yaml:"route"`
+	Handlers []string `yaml:"handlers"` // API处理器名称列表
 }
 
 // RedisConfig 为redis的配置
@@ -68,13 +90,15 @@ type App struct {
 	Config *Config
 }
 
+// NewApp 初始化一个App
 func NewApp() *App {
 	return &App{
 		Config: &Config{},
 	}
 }
 
-func (a *App) Load(path string) error {
+// LoadFromYamlFile 从指定路径的yaml文件加载配置
+func (a *App) LoadFromYamlFile(path string) error {
 	configFile, err := file.GetFile(path)
 	if err != nil {
 		//logger.Fatal("无法加载配置文件\"", path, "\": ", err)
@@ -89,6 +113,16 @@ func (a *App) Load(path string) error {
 	err = base.ParseYamlFromString(string(content), a.Config)
 	if err != nil {
 		//logger.Fatal("配置文件错误: ", err)
+		return err
+	}
+	return nil
+}
+
+// LoadFromYamlContent 从给定的yaml内容加载配置
+func (a *App) LoadFromYamlContent(yaml string) error {
+	a.Config = &Config{}
+	err := base.ParseYamlFromString(yaml, a.Config)
+	if err != nil {
 		return err
 	}
 	return nil

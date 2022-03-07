@@ -1,4 +1,4 @@
-package base
+package digest
 
 import (
 	"bytes"
@@ -6,6 +6,7 @@ import (
 	"crypto/des"
 )
 
+// DesEncryption 将输入进行DES加密
 func DesEncryption(key, iv, plainText []byte) ([]byte, error) {
 
 	block, err := des.NewCipher(key)
@@ -22,6 +23,7 @@ func DesEncryption(key, iv, plainText []byte) ([]byte, error) {
 	return crypt, nil
 }
 
+// DesDecryption 将输入进行DES解密
 func DesDecryption(key, iv, cipherText []byte) ([]byte, error) {
 
 	block, err := des.NewCipher(key)
@@ -48,21 +50,3 @@ func pkcs5UnPadding(src []byte) []byte {
 	unPadding := int(src[length-1])
 	return src[:(length - unPadding)]
 }
-
-/*func TestDES(t *testing.T) {
-	originalText := convert.Int64ToStr(time.Now().UnixNano()) + "|123456789012345678901234567890df"
-	fmt.Println(originalText)
-	mytext := []byte(originalText)
-
-	key := []byte{0xBC, 0xBC, 0xBC, 0xBC, 0xBC, 0xBC, 0xBC, 0xBC}
-	iv := []byte{0xBC, 0xBC, 0xBC, 0xBC, 0xBC, 0xBC, 0xBC, 0xBC}
-
-	cryptoText, _ := DesEncryption(key, iv, mytext)
-	base64String := base64.StdEncoding.EncodeToString(cryptoText)
-	//																// fDE1NjExMDAwOTY5NTM4MzI2MDD10pSRpEgO4DZti3M2w/YkYNKl0TvWxyQ=
-	//base64String := base64.StdEncoding.EncodeToString(cryptoText) // 9dKUkaRIDuA2bYtzNsP2JGDSpdE71sck
-	fmt.Println(base64String)
-	bs, _ := base64.StdEncoding.DecodeString(base64String)
-	decryptedText, _ := DesDecryption(key, iv, bs)
-	fmt.Println(string(decryptedText))
-}*/

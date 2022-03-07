@@ -6,9 +6,6 @@ package base
 
 import (
 	"container/list"
-	"crypto/md5"
-	"encoding/hex"
-	"io"
 	"net"
 	"strconv"
 	"strings"
@@ -75,19 +72,6 @@ func WalkList(ls *list.List, walker func(item interface{}) bool) {
 			break
 		}
 	}
-}
-
-// Md5Sum calculates md5 value of some strings.
-func Md5Sum(input ...string) string {
-	h := md5.New()
-	if input != nil {
-		for _, v := range input {
-			io.WriteString(h, v)
-		}
-	}
-	sliceCipherStr := h.Sum(nil)
-	sMd5 := hex.EncodeToString(sliceCipherStr)
-	return sMd5
 }
 
 // LimitRange limits a variable's value in a value range.

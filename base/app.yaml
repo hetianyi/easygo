@@ -1,6 +1,33 @@
 server:
   host: 0.0.0.0
   port: 8080
+  mode: release
+  useGinLogger: true
+  middleWares:
+    - middleWares1
+    - middleWares2
+  validators:
+    - validators1
+    - validators2
+  groups:
+    - prefix: /api/v1
+      middleWares:
+        - middleWares1
+        - middleWares2
+      apis:
+        - route: /user
+          handlers:
+            - handlers1
+            - handlers2
+    - prefix: /api/v2
+      middleWares:
+        - middleWares1
+        - middleWares2
+      apis:
+        - route: /user
+          handlers:
+            - handlers1
+            - handlers2
 
 mysql:
   conn: root:123456@tcp(127.0.0.1:3306)/gin?charset=utf8&parseTime=True&loc=Local
