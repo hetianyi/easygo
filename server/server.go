@@ -18,13 +18,16 @@ import (
 )
 
 func Start(serverConfig *app.Server) error {
-	gin.SetMode(gin.ReleaseMode)
+
+	gin.SetMode(serverConfig.GinMode)
 
 	r := gin.New()
 	gin.ForceConsoleColor()
+
 	if serverConfig.UseGinLogger {
 		r.Use(gin.Logger())
 	}
+
 	r.Use(gin.Recovery())
 
 	if vrs, ok := binding.Validator.Engine().(*validator.Validate); ok {
@@ -98,18 +101,6 @@ func addGroup(r *gin.Engine, group *gin.RouterGroup, g app.ApiGroup) {
 		sg := group.Group(subGroup.Prefix, smws...)
 		addGroup(r, sg, subGroup)
 	}
-}
-
-var allowedHttpRouteMethod = map[string]bool{
-	"post":    true,
-	"get":     true,
-	"delete":  true,
-	"patch":   true,
-	"put":     true,
-	"options": true,
-	"head":    true,
-	"trace":   true,
-	"connect": true,
 }
 
 var (
