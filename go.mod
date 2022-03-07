@@ -15,9 +15,10 @@ require (
 	github.com/hetianyi/base64Captcha v1.4.1
 	github.com/json-iterator/go v1.1.12
 	github.com/logrusorgru/aurora v2.0.3+incompatible
+	github.com/mattn/go-colorable v0.1.12
 	github.com/mholt/archiver v2.1.0+incompatible
 	github.com/nwaples/rardecode v1.1.2 // indirect
-	github.com/onsi/ginkgo v1.16.5 // indirect
+	github.com/onsi/ginkgo v1.16.5
 	github.com/onsi/gomega v1.18.1 // indirect
 	github.com/pierrec/lz4 v2.6.1+incompatible // indirect
 	github.com/satori/go.uuid v1.2.0

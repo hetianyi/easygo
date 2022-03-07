@@ -24,34 +24,37 @@ var (
 )
 
 type logger struct {
-	Out       io.Writer
-	lock      sync.Mutex
-	Prefix    string
-	Level     LogLevel
-	callLevel int
-	formatter Formatter
+	Out             io.Writer
+	ColorableOutput bool // 是否打印彩色输出
+	lock            sync.Mutex
+	Prefix          string
+	Level           LogLevel
+	callLevel       int
+	formatter       Formatter
 }
 
 type Formatter func(l *logger, t time.Time, level LogLevel, v ...interface{})
 
 // New 初始化一个日志实例
-func New(out io.Writer, prefix string, level LogLevel, formatter Formatter) *logger {
+func New(out io.Writer, colorableOutput bool, prefix string, level LogLevel, formatter Formatter) *logger {
 	return &logger{
-		Out:       out,
-		Prefix:    prefix,
-		Level:     level,
-		callLevel: 4,
-		formatter: base.TValue(formatter == nil, DefaultFormatter, formatter).(Formatter),
+		Out:             out,
+		ColorableOutput: colorableOutput,
+		Prefix:          prefix,
+		Level:           level,
+		callLevel:       4,
+		formatter:       base.TValue(formatter == nil, DefaultFormatter, formatter).(Formatter),
 	}
 }
 
 // newDefaultLogger 初始化一个默认日志实例
 func newDefaultLogger() *logger {
 	return &logger{
-		Out:       os.Stdout,
-		callLevel: 5,
-		Level:     LevelInfo,
-		formatter: DefaultFormatter,
+		Out:             os.Stdout,
+		ColorableOutput: true,
+		callLevel:       5,
+		Level:           LevelInfo,
+		formatter:       DefaultFormatter,
 	}
 }
 
