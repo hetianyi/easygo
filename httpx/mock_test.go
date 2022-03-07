@@ -61,6 +61,8 @@ func TestMock_Get(t *testing.T) {
 	logger.Info(status)
 	logger.Info("请求返回：\n", res)*/
 
+	logger.SetColorable(false)
+
 	type BilibiliResponse struct {
 		Code    int    `json:"code"`
 		Message string `json:"message"`

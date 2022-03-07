@@ -32,6 +32,14 @@ func SetOut(out io.Writer) {
 	defaultLogger.Out = out
 }
 
+// SetColorable 设置是否打印彩色日志
+//
+// 如果是自定义的formatter，则需要自行实现彩色输出
+func SetColorable(colorable bool) {
+	initLogger()
+	defaultLogger.ColorableOutput = colorable
+}
+
 // SetFormatter 设置日志格式器
 func SetFormatter(formatter Formatter) {
 	initLogger()

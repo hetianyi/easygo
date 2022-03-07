@@ -2,6 +2,7 @@ package logger
 
 import (
 	"github.com/hetianyi/easygo/base"
+	"github.com/mattn/go-colorable"
 	"io"
 	"os"
 	"sync"
@@ -50,7 +51,7 @@ func New(out io.Writer, colorableOutput bool, prefix string, level LogLevel, for
 // newDefaultLogger 初始化一个默认日志实例
 func newDefaultLogger() *logger {
 	return &logger{
-		Out:             os.Stdout,
+		Out:             colorable.NewColorableStdout(),
 		ColorableOutput: true,
 		callLevel:       5,
 		Level:           LevelInfo,
@@ -73,6 +74,16 @@ func (l *logger) SetOut(out io.Writer) {
 	defer l.lock.Unlock()
 
 	l.Out = out
+}
+
+// SetColorable 设置是否打印彩色日志
+//
+// 如果是自定义的formatter，则需要自行实现彩色输出
+func (l *logger) SetColorable(colorable bool) {
+	l.lock.Lock()
+	defer l.lock.Unlock()
+
+	l.ColorableOutput = colorable
 }
 
 // SetFormatter 设置日志格式器
