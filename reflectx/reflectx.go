@@ -21,13 +21,13 @@ type Config struct {
 }
 
 func Start(a interface{}) {
-	Configure(reflect.ValueOf(a))
+	Configure(reflect.ValueOf(a), reflect.TypeOf(a))
 }
 
-func Configure(a reflect.Value, field ...reflect.StructField) {
+func Configure(a reflect.Value, extractType reflect.Type, field ...reflect.StructField) {
 	if a.Kind() == reflect.Ptr {
 		println(a.Kind().String())
-		Configure(a.Elem(), field...)
+		Configure(a.Elem(), extractType.Elem(), field...)
 		return
 	}
 	//println(a.Type().String(), a.Kind().String(), a.CanAddr())
@@ -37,7 +37,9 @@ func Configure(a reflect.Value, field ...reflect.StructField) {
 	}
 	println(a.String())
 	println(a.Kind().String())
-	if isBasicType(field[0].Type.Kind()) {
+	println(extractType.String())
+	println(extractType.Kind().String())
+	if isBasicType(extractType.Kind()) {
 		resolveBasicField(a, field[0])
 	}
 }
@@ -58,8 +60,10 @@ func IteratorStruct(a reflect.Value) {
 	typ := a.Type()
 	for i := 0; i < a.NumField(); i++ {
 		f := a.Field(i)
-		println(f.String())
-		Configure(f, typ.Field(i))
+		println(f.IsNil())
+		println(f.IsZero())
+		f.Send()
+		Configure(f, typ.Field(i).Type, typ.Field(i))
 	}
 }
 
