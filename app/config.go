@@ -13,13 +13,13 @@ import (
 
 // Server 为http服务器的配置
 type Server struct {
-	Host         string     `yaml:"host"`         // HTTP服务监听地址
-	Port         int        `yaml:"port"`         // HTTP服务监听端口
-	GinMode      string     `yaml:"mode"`         // 服务启动模式：debug|release
-	UseGinLogger bool       `yaml:"useGinLogger"` // 是否开启gin的默认Logger
-	MiddleWares  []string   `yaml:"middleWares"`  // 中间件名称列表
-	Validators   []string   `yaml:"validators"`   // 校验器名称列表
-	ApiGroup     []ApiGroup `yaml:"groups"`       // 路由配置
+	Host         string     `yaml:"host" env:"HTTP_HOST"`                   // HTTP服务监听地址
+	Port         int        `yaml:"port" env:"HTTP_PORT"`                   // HTTP服务监听端口
+	GinMode      string     `yaml:"mode" env:"HTTP_GIN_MODE"`               // 服务启动模式：debug|release
+	UseGinLogger bool       `yaml:"useGinLogger" env:"HTTP_USE_GIN_LOGGER"` // 是否开启gin的默认Logger
+	MiddleWares  []string   `yaml:"middleWares"`                            // 中间件名称列表
+	Validators   []string   `yaml:"validators"`                             // 校验器名称列表
+	ApiGroup     []ApiGroup `yaml:"groups"`                                 // 路由配置
 }
 
 type ApiGroup struct {
@@ -43,10 +43,10 @@ type Api struct {
 //
 // requires github.com/go-redis/redis
 type RedisConfig struct {
-	Host      string `yaml:"host"` // 服务器地址
-	Port      int    `yaml:"port"` // 服务端口
-	Pass      string `yaml:"pass"` // 密码
-	DefaultDB int    `yaml:"db"`   // 默认数据库
+	Host      string `yaml:"host" env:"REDIS_HOST"` // 服务器地址
+	Port      int    `yaml:"port" env:"REDIS_PORT"` // 服务端口
+	Pass      string `yaml:"pass" env:"REDIS_PASS"` // 密码
+	DefaultDB int    `yaml:"db" env:"REDIS_DB"`     // 默认数据库
 }
 
 // MysqlConfig 为mysql的配置
@@ -126,4 +126,7 @@ func (a *App) LoadFromYamlContent(yaml string) error {
 		return err
 	}
 	return nil
+}
+
+func checkEnvironmentVariables(c interface{}) {
 }
