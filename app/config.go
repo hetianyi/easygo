@@ -80,7 +80,7 @@ type CaptchaConfig struct {
 // Config 为全部配置
 // requires gopkg.in/yaml.v2
 type Config struct {
-	Server        Server        `yaml:"server"`
+	Server        *Server       `yaml:"server"`
 	RedisConfig   RedisConfig   `yaml:"redis"`
 	MysqlConfig   MysqlConfig   `yaml:"mysql"`
 	CaptchaConfig CaptchaConfig `yaml:"captcha"`
@@ -126,7 +126,4 @@ func (a *App) LoadFromYamlContent(yaml string) error {
 		return err
 	}
 	return nil
-}
-
-func checkEnvironmentVariables(c interface{}) {
 }
