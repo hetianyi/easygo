@@ -5,7 +5,6 @@ import (
 	json "github.com/json-iterator/go"
 	"os"
 	"reflect"
-	"strings"
 	"testing"
 )
 
@@ -38,6 +37,7 @@ func TestNewApp(t *testing.T) {
 	println(toString)
 }
 
+/*
 func resolveStruct(a interface{}) {
 	if !isPtr(a) {
 		panic("无法处理，输入必须是一个struct指针")
@@ -91,7 +91,7 @@ func resolveStruct(a interface{}) {
 	}
 	toString, _ := json.MarshalToString(a)
 	println(toString)
-}
+}*/
 
 func TestNewApp2(t *testing.T) {
 	ConfigureEnvVariables(&Config{
@@ -136,7 +136,7 @@ func extractPointer1(s interface{}) {
 		break
 	}
 
-	realType := reflect.TypeOf(val.Interface())
+	/*realType := reflect.TypeOf(val.Interface())
 
 	for i := 0; i < realType.NumField(); i++ {
 		f := realType.Field(i)
@@ -153,7 +153,7 @@ func extractPointer1(s interface{}) {
 			v := convertType(envValue, f.Type.Kind())
 			val.Field(i).Set(v)
 		}
-	}
+	}*/
 }
 
 func TestNewApp4(t *testing.T) {

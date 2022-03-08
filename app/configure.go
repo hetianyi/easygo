@@ -3,7 +3,9 @@ package app
 import (
 	"errors"
 	"github.com/hetianyi/easygo/convert"
+	"os"
 	"reflect"
+	"strings"
 )
 
 // ConfigureEnvVariables 将环境变量值填充/覆盖到给定的struct配置。
@@ -29,8 +31,8 @@ func configure(val reflect.Value, realType reflect.Type) reflect.Value {
 	for i := 0; i < val.NumField(); i++ {
 		f := realType.Field(i)
 		//println(f.Name, " ", f.Type.Kind(), " ", f.Type.Kind().String())
-		if !isBasicType(f.Type.Kind()) {
-			if f.Type.Kind() == reflect.Struct {
+		if !isBasicType(f.Type) {
+			if isFieldStructType(val.Field(i).Type()) {
 				tmp := reflect.New(reflect.TypeOf(val.Field(i).Interface())).Elem()
 				//println(tmp.CanAddr())
 				tmp.Set(val.Field(i))
@@ -40,23 +42,22 @@ func configure(val reflect.Value, realType reflect.Type) reflect.Value {
 			}
 			continue
 		}
-
+		resolveBasicField(f, val.Field(i))
 	}
 	return val
 }
 
-/*
-func resolveField(ft reflect.StructField, fv reflect.Value) {
+func resolveBasicField(ft reflect.StructField, fv reflect.Value) {
 	tag := strings.TrimSpace(ft.Tag.Get("env"))
 	if tag == "" {
 		return
 	}
-	envValue, exist := os.LookupEnv(ftTag.Get("env"))
+	envValue, exist := os.LookupEnv(ft.Tag.Get("env"))
 	if exist {
 		v := convertType(envValue, ft.Type.Kind())
 		fv.Set(v)
 	}
-}*/
+}
 
 func isPtr(a interface{}) bool {
 	typ := reflect.TypeOf(a)
@@ -138,7 +139,11 @@ func convertType(value string, typ reflect.Kind) reflect.Value {
 	return reflect.ValueOf(v)
 }
 
-func isBasicType(k reflect.Kind) bool {
+func isBasicType(t reflect.Type) bool {
+	if t.Kind() == reflect.Ptr {
+		return isBasicType(t.Elem())
+	}
+	k := t.Kind()
 	return k == reflect.Bool ||
 		k == reflect.Int ||
 		k == reflect.Int8 ||
@@ -153,4 +158,11 @@ func isBasicType(k reflect.Kind) bool {
 		k == reflect.Float32 ||
 		k == reflect.Float64 ||
 		k == reflect.String
+}
+
+func isFieldStructType(t reflect.Type) bool {
+	if t.Kind() == reflect.Ptr || t.Kind() == reflect.Interface {
+		return isFieldStructType(t.Elem())
+	}
+	return t.Kind() == reflect.Struct
 }
